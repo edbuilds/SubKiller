@@ -1,8 +1,6 @@
 const STORAGE_KEY = 'subkiller_subscriptions';
 const CURRENCY_KEY = 'subkiller_currency';
-const THEME_KEY = 'subkiller_theme';
 const SUPPORTED_CURRENCIES = ['USD', 'CHF', 'EUR', 'GBP'];
-const SUPPORTED_THEMES = ['dark', 'light'];
 
 const form = document.getElementById('subscription-form');
 const listContainer = document.getElementById('subscription-list');
@@ -13,11 +11,9 @@ const possibleSavingsEl = document.getElementById('possible-savings');
 const mainYearlyMessageEl = document.getElementById('main-yearly-message');
 const clearAllButton = document.getElementById('clear-all');
 const currencySelect = document.getElementById('currency');
-const themeToggle = document.getElementById('theme-toggle');
 
 let subscriptions = loadSubscriptions();
 let selectedCurrency = loadCurrency();
-let selectedTheme = loadTheme();
 
 function readStorage(key) {
   try {
@@ -83,25 +79,6 @@ function loadCurrency() {
 
 function saveCurrency() {
   writeStorage(CURRENCY_KEY, selectedCurrency);
-}
-
-function loadTheme() {
-  const storedTheme = readStorage(THEME_KEY);
-  return SUPPORTED_THEMES.includes(storedTheme) ? storedTheme : 'dark';
-}
-
-function saveTheme() {
-  writeStorage(THEME_KEY, selectedTheme);
-}
-
-function applyTheme() {
-  const isLightTheme = selectedTheme === 'light';
-
-  document.body.classList.toggle('light-theme', isLightTheme);
-  themeToggle.setAttribute('aria-label', isLightTheme ? 'Switch to dark mode' : 'Switch to light mode');
-  themeToggle.setAttribute('aria-pressed', String(isLightTheme));
-  themeToggle.querySelector('.theme-toggle-icon').textContent = isLightTheme ? '🌙' : '☀️';
-  themeToggle.querySelector('.theme-toggle-text').textContent = isLightTheme ? 'Dark mode' : 'Light mode';
 }
 
 function createSubscriptionId() {
@@ -258,11 +235,4 @@ currencySelect.addEventListener('change', () => {
 
 clearAllButton.addEventListener('click', clearAllSubscriptions);
 
-themeToggle.addEventListener('click', () => {
-  selectedTheme = selectedTheme === 'light' ? 'dark' : 'light';
-  saveTheme();
-  applyTheme();
-});
-
-applyTheme();
 renderSubscriptions();
