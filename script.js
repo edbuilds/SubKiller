@@ -1,6 +1,8 @@
 const STORAGE_KEY = 'subkiller_subscriptions';
 const CURRENCY_KEY = 'subkiller_currency';
+const THEME_KEY = 'subkiller_theme';
 const SUPPORTED_CURRENCIES = ['USD', 'CHF', 'EUR', 'GBP'];
+const SUPPORTED_THEMES = ['dark', 'light'];
 
 const form = document.getElementById('subscription-form');
 const listContainer = document.getElementById('subscription-list');
@@ -11,9 +13,50 @@ const possibleSavingsEl = document.getElementById('possible-savings');
 const mainYearlyMessageEl = document.getElementById('main-yearly-message');
 const clearAllButton = document.getElementById('clear-all');
 const currencySelect = document.getElementById('currency');
+const themeToggle = document.getElementById('theme-toggle');
 
 let subscriptions = loadSubscriptions();
 let selectedCurrency = loadCurrency();
+let selectedTheme = loadTheme();
+
+function readStorage(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeStorage(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // SubKiller still works for the current session when browser storage is unavailable.
+  }
+}
+
+function normalizeSubscription(item) {
+  if (!item || typeof item !== 'object') return null;
+
+  const name = String(item.name || '').trim();
+  const price = Number(item.price);
+  const cycle = ['weekly', 'monthly', 'yearly'].includes(item.cycle) ? item.cycle : 'monthly';
+  const usage = ['often', 'sometimes', 'rarely', 'never'].includes(item.usage) ? item.usage : 'sometimes';
+  const category = ['entertainment', 'software', 'fitness', 'gaming', 'cloud', 'other'].includes(item.category)
+    ? item.category
+    : 'other';
+
+  if (!name || !Number.isFinite(price) || price < 0) return null;
+
+  return {
+    id: String(item.id || createSubscriptionId()),
+    name,
+    price,
+    cycle,
+    usage,
+    category,
+  };
+}
 
 function loadSubscriptions() {
   const raw = readStorage(STORAGE_KEY);
@@ -42,6 +85,25 @@ function saveCurrency() {
   writeStorage(CURRENCY_KEY, selectedCurrency);
 }
 
+function loadTheme() {
+  const storedTheme = readStorage(THEME_KEY);
+  return SUPPORTED_THEMES.includes(storedTheme) ? storedTheme : 'dark';
+}
+
+function saveTheme() {
+  writeStorage(THEME_KEY, selectedTheme);
+}
+
+function applyTheme() {
+  const isLightTheme = selectedTheme === 'light';
+
+  document.body.classList.toggle('light-theme', isLightTheme);
+  themeToggle.setAttribute('aria-label', isLightTheme ? 'Switch to dark mode' : 'Switch to light mode');
+  themeToggle.setAttribute('aria-pressed', String(isLightTheme));
+  themeToggle.querySelector('.theme-toggle-icon').textContent = isLightTheme ? '🌙' : '☀️';
+  themeToggle.querySelector('.theme-toggle-text').textContent = isLightTheme ? 'Dark mode' : 'Light mode';
+}
+
 function createSubscriptionId() {
   return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
@@ -55,15 +117,6 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
-function loadCurrency() {
-  const storedCurrency = localStorage.getItem(CURRENCY_KEY);
-  return SUPPORTED_CURRENCIES.includes(storedCurrency) ? storedCurrency : 'USD';
-}
-
-function saveCurrency() {
-  localStorage.setItem(CURRENCY_KEY, selectedCurrency);
-}
-
 function determineVerdict(usage) {
   const verdictMap = {
     often: 'Keep',
@@ -72,6 +125,10 @@ function determineVerdict(usage) {
     never: 'Cancel now',
   };
   return verdictMap[usage] || 'Consider';
+}
+
+function getVerdictClass(verdict) {
+  return verdict.toLowerCase().replaceAll(' ', '-');
 }
 
 function getMonthlyCost(price, cycle) {
@@ -201,4 +258,11 @@ currencySelect.addEventListener('change', () => {
 
 clearAllButton.addEventListener('click', clearAllSubscriptions);
 
+themeToggle.addEventListener('click', () => {
+  selectedTheme = selectedTheme === 'light' ? 'dark' : 'light';
+  saveTheme();
+  applyTheme();
+});
+
+applyTheme();
 renderSubscriptions();
