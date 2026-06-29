@@ -286,6 +286,9 @@ button:focus-visible {
   justify-content: space-between;
   gap: 1rem;
 }
+.feedback-panel h2 {
+  margin-bottom: 0.35rem;
+}
 .feedback-panel p,
 .site-footer p {
   margin: 0;
@@ -331,6 +334,7 @@ button:focus-visible {
   .site-footer { width: min(1080px, 95vw); }
   .container { gap: 0.85rem; }
   .panel { padding: 0.9rem; }
+  .feedback-panel { align-items: stretch; flex-direction: column; }
   .subscription-form { grid-template-columns: 1fr; }
   .subscription-list { grid-template-columns: 1fr; }
   .stats-list li { font-size: 0.94rem; }
