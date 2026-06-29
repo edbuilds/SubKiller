@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <div class="top-actions" aria-label="Display settings">
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light mode" aria-pressed="false">
+        <span class="theme-toggle-icon" aria-hidden="true">☀️</span>
+        <span class="theme-toggle-text">Light mode</span>
+      </button>
+    </div>
+
     <section class="landing" aria-label="Welcome section">
       <div class="landing-content">
         <p class="landing-kicker">Welcome to SubKiller</p>
@@ -120,6 +127,21 @@
       <section class="panel list-panel" aria-label="Subscription list">
         <h2>Your subscriptions</h2>
         <div id="subscription-list" class="subscription-list"></div>
+      </section>
+
+      <section class="panel feedback-panel" aria-labelledby="feedback-title">
+        <div>
+          <h2 id="feedback-title">Help Improve SubKiller</h2>
+          <p class="feedback-note">
+            Share quick feedback through Google Forms. No subscription information is collected by SubKiller;
+            the only purpose is improving the tool.
+          </p>
+        </div>
+        <a class="btn feedback-button" href="https://forms.gle/xdrcAc2wWaxzGUVR6" target="_blank" rel="noopener noreferrer">
+          <span class="feedback-button-icon" aria-hidden="true">💬</span>
+          <span>Give feedback</span>
+          <span class="feedback-button-arrow" aria-hidden="true">→</span>
+        </a>
       </section>
 
       <section class="info-grid" aria-label="Subscription help">
